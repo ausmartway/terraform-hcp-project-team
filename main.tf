@@ -46,7 +46,7 @@ resource "tfe_team_project_access" "default" {
   for_each = var.team_project_access
 
   access     = each.value.team.access
-  team_id    = hcp_group.this[each.key].id
+  team_id    = hcp_group.this[each.key].resource_id
   project_id = hcp_project.consumer.resource_id
 }
 
