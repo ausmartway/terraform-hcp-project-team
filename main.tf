@@ -42,7 +42,11 @@ resource "hcp_group" "custom" {
   # sso_team_id  = try(each.value.team.sso_team_id, null)
 }
 
-resource "null_resource" "previous" {}
+#introduce a 30 seconds delay so hcp_group and hcp_project are synced as tfe_team and tfe_project
+resource "null_resource" "previous" {
+    depends_on = [hcp_project.consumer]
+
+}
 
 resource "time_sleep" "wait_30_seconds" {
   depends_on = [null_resource.previous]
