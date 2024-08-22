@@ -42,12 +42,26 @@ resource "hcp_group" "custom" {
   # sso_team_id  = try(each.value.team.sso_team_id, null)
 }
 
+resource "null_resource" "previous" {}
+
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [null_resource.previous]
+
+  create_duration = "30s"
+}
+
+# This resource will create (at least) 30 seconds after null_resource.previous
+resource "null_resource" "next" {
+  depends_on = [time_sleep.wait_30_seconds]
+}
+
 resource "tfe_team_project_access" "default" {
   for_each = var.team_project_access
 
   access     = each.value.team.access
   team_id    = hcp_group.this[each.key].resource_id
   project_id = hcp_project.consumer.resource_id
+  depends_on = [ null_resource.next ]
 }
 
 resource "tfe_team_project_access" "custom" {
